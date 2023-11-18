@@ -1,5 +1,5 @@
 # Tmux
-- configure proper colorscheme for Neovim with Tmux
+- Configure proper colorscheme for Neovim with Tmux
 - https://stackoverflow.com/questions/66757229/vim-not-using-proper-colorscheme-in-tmux
 add the following lines to tmux.conf:
 	set -g default-terminal "tmux-256color"
