@@ -11,14 +11,29 @@ Get-Process -IncludeUserName | Where-Object UserName | ForEach-Object {
     }
 }
 
-# Get established connections with process details
-Get-NetTCPConnection | Where-Object State -EQ 'Established' | ForEach-Object {
-    $proc = $processLookup[[int]$_.OwningProcess]
-    [PSCustomObject]@{
-        RemoteAddress = $_.RemoteAddress
-        RemotePort    = $_.RemotePort
-        PID           = $_.OwningProcess
-        ProcessName   = $proc.ProcessName
-        UserName      = $proc.UserName
+function CustomGet-NetTCPConnection {
+    Set-StrictMode -Version Latest
+
+    # Get established connections with process details
+    Get-NetTCPConnection | Where-Object State -EQ 'Established' | ForEach-Object {
+        $proc = $processLookup[[int]$_.OwningProcess]
+        [PSCustomObject]@{
+            RemoteAddress = $_.RemoteAddress
+            RemotePort    = $_.RemotePort
+            PID           = $_.OwningProcess
+            ProcessName   = $proc.ProcessName
+            UserName      = $proc.UserName
+        }
+    } | Sort-Object ProcessName, UserName | Format-Table -AutoSize
+}
+
+$customScripts = @{}
+$customScripts.Add("CustomGet-NetTCPConnection", [scriptblock]{CustomGet-NetTCPConnection}) | Out-Null
+
+foreach ($pair in $customScripts.GetEnumerator()) {
+    try {
+        & $pair.Value
+    } catch {
+        Write-Host "Error running $($pair.Key)"
     }
-} | Sort-Object ProcessName, UserName | Format-Table -AutoSize
+}
