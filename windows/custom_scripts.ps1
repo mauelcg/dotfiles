@@ -28,7 +28,8 @@ $customScripts.Add("CustomGet-NetTCPConnection", [scriptblock]{CustomGet-NetTCPC
 
 foreach ($pair in $customScripts.GetEnumerator()) {
     try {
-        & $pair.Value
+        & $pair.Value | Out-Null
+        Write-Host "Loaded $($pair.Key)"
     } catch {
         Write-Host "Error running $($pair.Key)"
     }
